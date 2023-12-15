@@ -1,70 +1,49 @@
 // include the library code
-#include <NewPing.h>
-#include <TVout.h>
 
-#define TRIGGER_PIN_1      2   // Arduino pin tied to trigger pin on the ultrasonic sensor.
-#define ECHO_PIN_1         3   // Arduino pin tied to echo pin on the ultrasonic sensor.
-#define TRIGGER_PIN_2      5   // Arduino pin tied to trigger pin on the ultrasonic sensor.
-#define ECHO_PIN_2         6   // Arduino pin tied to echo pin on the ultrasonic sensor.
-#define TRIGGER_PIN_3      11  // Arduino pin tied to trigger pin on the ultrasonic sensor.
-#define ECHO_PIN_3         12  // Arduino pin tied to echo pin on the ultrasonic sensor.
-#define MAX_DISTANCE       400 // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
-#define DETECTION_DISTANCE 20 //Distance that counts as detection
+#define DETECTION_DISTANCE 200 //Distance that counts as detection
 
-NewPing sonar1(TRIGGER_PIN_1, ECHO_PIN_1, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
-NewPing sonar2(TRIGGER_PIN_2, ECHO_PIN_2, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
-NewPing sonar3(TRIGGER_PIN_3, ECHO_PIN_3, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
+//distance variables for each sensor
 int dist1 = 0;
 int dist2 = 0;
 int dist3 = 0;
+int dist4 = 0;
+int dist5 = 0;
+
 int lastSensor = 3;
 int highSensor = 0;
 bool change = false;
 
-TVout TV;
 
 void setup() {
   Serial.begin(9600); // Open serial monitor at 115200 baud to see ping results.
-  TV.begin(PAL, 128, 96);
-  Serial.println("#S|STARTPPTX|[]#");
+  Serial.println("#S|STARTPPTX|[]#"); // Tell inbetweeno to start the Powerpoint Application
 }
 
 void loop() {
-  delay(100); // Wait 50ms between pings (about 20 pings/sec). 29ms should be the shortest delay between pings.
+  delay(100); // Maybe not neccesasary
   
-  //Print Ping in the Serial Monitor
-  unsigned int uS1 = sonar1.ping(); // Send ping, get ping time in microseconds (uS).
-  dist1 = uS1 / US_ROUNDTRIP_CM; //convert to cm
-  //Serial.print("Ping_1: ");
-  //Serial.print(dist1);
-  //Serial.print("cm | ");
-  
-  unsigned int uS2 = sonar2.ping(); // Send ping, get ping time in microseconds (uS).
-  dist2 = uS2 / US_ROUNDTRIP_CM; //convert to cm
-  //Serial.print("Ping_2: ");
-  //Serial.print(dist2);
-  //Serial.print("cm | ");
-
-  unsigned int uS3 = sonar3.ping(); // Send ping, get ping time in microseconds (uS).
-  dist3 = uS3 / US_ROUNDTRIP_CM; //convert to cm
-  //Serial.print("Ping_3: ");
-  //Serial.print(dist3);
-  //Serial.print("cm | ");
+  //TODO: Calculate distances
+  dist1 = 0;
+  dist2 = 0;
+  dist3 = 0;
+  dist4 = 0;
+  dist5 = 0;
 
   highSensor = sensorcheck();
 
   if (highSensor != lastSensor && highSensor !=0){
-    if(highSensor>lastSensor){
+    if(highSensor>lastSensor){ //a new sensor closer to the end has been trigered
       Serial.println("#S|SENDK|[0&{RIGHT}]#");
     }
-    else{
+    else{ //a new sensor closer to the start has been trigered
       Serial.println("#S|SENDK|[0&{LEFT}]#");
     }
     lastSensor = highSensor;
     change = true;
+    //TODO: multiple steps if a sensor is skipped
   }
 
-  switch(lastSensor) {
+  switch(lastSensor) { //maybe not needed anymore
     case 0:
       // no change 
       break;
@@ -75,32 +54,37 @@ void loop() {
     case 3: //#005493 (DUNKELBLAU);
       break;
       case 4: //#8DD4FB (HELLBLAU)
-      //TODO
       break;
       case 5: //furthest Sensor #FFFFFF (WEIẞ)
-      //TODO
       break;
-    default:
+    default: //should not happen
       break;
   }
   if (change){
+    //flicker prevention
     delay (400);
     change = false;
   }
 }
 
 int sensorcheck() {
-  if (dist1 < DETECTION_DISTANCE){ //closest sensor
+  if (dist1 < DETECTION_DISTANCE && dist1 != 0){ //closest sensor
   //  Serial.println("sensor 1");
     return 1;
-  } else if (dist2 < DETECTION_DISTANCE) {
+  } else if (dist2 < DETECTION_DISTANCE && dist2 != 0) {
   //  Serial.println("sensor 2");
     return 2;
-  } else if (dist3 < DETECTION_DISTANCE) {
+  } else if (dist3 < DETECTION_DISTANCE && dist3 != 0) {
   //  Serial.println("sensor 3");
     return 3;
+  } else if (dist4 < DETECTION_DISTANCE && dist4 != 0) {
+  //  Serial.println("sensor 4");
+    return 4;
+  } else if (dist5 < DETECTION_DISTANCE && dist5dw != 0) {
+  //  Serial.println("sensor 5");
+    return 5;
   } else { //no sensor detectects anything
-  //  Serial.println("no sensor"); //TODO: Something about this makes the screen flicker
+  //  Serial.println("no sensor"); 
     return 0;
   }
 }
