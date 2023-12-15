@@ -1,6 +1,10 @@
 // include the library code
 #include <NewPing.h>
 
+#include "I2Cdev.h"
+#include "MPU6050.h"
+#include "Wire.h"
+
 #define VIBSWPIN        8    // Arduino pin tied to the Vibration Switch.
 #define LEDPIN          11   // Arduino pin tied to LED.
 #define LEDPIN2         12   // Arduino pin tied to the second LED.
@@ -16,12 +20,17 @@ int shock = 0; //initialize the variable shock as 0 TODO: could use for error ha
 int dist = 0;
 int randomValue = 0;
 
+MPU6050 accelgyro;
+int16_t ax, ay, az;
+
 void setup()
 {
   pinMode(VIBSWPIN,INPUT); //initialize vibration switch as an input
   pinMode(LEDPIN,OUTPUT); //initialize ledPin switch as an output
   pinMode(LEDPIN2,OUTPUT); //initialize ledPin switch as an output
   Serial.begin(115200);
+  Wire.begin();
+  accelgyro.initialize(); //TODO: Offset
 }
 
 void loop() {
@@ -35,9 +44,9 @@ void loop() {
   //TODO: Maybe move this part
 
   //If the Box is shaken start flickering
-  shock = digitalRead(VIBSWPIN); //read the value from vibration switch
-  Serial.println(shock);
-  if(shock == LOW)  //with vibration signal
+  accelgyro.getAcceleration(&ax, &ay, &az);
+  Serial.println(az);
+  if(az>23000)  //with vibration signal
   {
     flicker();
   }
