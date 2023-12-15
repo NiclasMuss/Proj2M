@@ -1,31 +1,35 @@
 // include the library code
+
+//Ultrasonic library
 #include <NewPing.h>
 
+//Gyro libraries
 #include "I2Cdev.h"
 #include "MPU6050.h"
 #include "Wire.h"
 
-#define VIBSWPIN        8    // Arduino pin tied to the Vibration Switch.
-#define LEDPIN          11   // Arduino pin tied to LED.
-#define LEDPIN2         12   // Arduino pin tied to the second LED.
-#define TRIGGER_PIN     2    // Arduino pin tied to trigger pin on the ultrasonic sensor.
-#define ECHO_PIN        3    // Arduino pin tied to echo pin on the ultrasonic sensor.
-#define MAX_DISTANCE    400  // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
-#define DETECTION_DISTANCE 10
-#define FLICKERDURATION 5000 //How many Milliseconds the flicker effect should play for
-#define FLICKERINTERVAL 50  //How many Milliseconds each flicker Interval should take
+//LED constants
+#define LEDPIN          11    // Arduino pin tied to LED.
+#define LEDPIN2         12    // Arduino pin tied to the second LED.
+#define FLICKERDURATION 5000  //How many Milliseconds the flicker effect should play for
+#define FLICKERINTERVAL 50    //How many Milliseconds each flicker Interval should take
+
+//Ultrasonic constants
+#define TRIGGER_PIN     2     // Arduino pin tied to trigger pin on the ultrasonic sensor.
+#define ECHO_PIN        3     // Arduino pin tied to echo pin on the ultrasonic sensor.
+#define MAX_DISTANCE    400   // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
+#define DETECTION_DISTANCE 10 //Distance that counts as detection
 
 NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
-int shock = 0; //initialize the variable shock as 0 TODO: could use for error handling
 int dist = 0;
 int randomValue = 0;
 
+//Gyro setup
 MPU6050 accelgyro;
 int16_t ax, ay, az;
 
 void setup()
 {
-  pinMode(VIBSWPIN,INPUT); //initialize vibration switch as an input
   pinMode(LEDPIN,OUTPUT); //initialize ledPin switch as an output
   pinMode(LEDPIN2,OUTPUT); //initialize ledPin switch as an output
   Serial.begin(115200);
@@ -43,23 +47,21 @@ void loop() {
   Serial.println("cm");
   //TODO: Maybe move this part
 
-  //If the Box is shaken start flickering
-  accelgyro.getAcceleration(&ax, &ay, &az);
+  //If the Box is lifted start flickering
+  accelgyro.getAcceleration(&ax, &ay, &az); //get Accelearation value
   Serial.println(az);
-  if(az>23000)  //with vibration signal
+  if(az>23000)  //when lifted
   {
     flicker();
   }
   
-  else  //without vibration signal
+  else  //when stationary
   {
-    if (dist < DETECTION_DISTANCE){ //Person is detected
-      digitalWrite(LEDPIN,HIGH); //turn on the led
-      digitalWrite(LEDPIN2,HIGH); //turn on the led
+    if (dist < DETECTION_DISTANCE){ //Person is detected (this can be done better)
+      turnLeds(HIGH);
     }
     else {
-      digitalWrite(LEDPIN,LOW); //turn off the led
-      digitalWrite(LEDPIN2,LOW); //turn off the led
+      turnLeds(LOW);
     }
   }
   delay (10);
@@ -89,4 +91,9 @@ void flicker(){
    
     delay(50);
   }
+}
+
+void turnLeds(int state){
+  digitalWrite(LEDPIN,state); //turn on the led
+  digitalWrite(LEDPIN2,state); //turn on the led
 }
