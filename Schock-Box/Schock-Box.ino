@@ -9,8 +9,10 @@
 #include "Wire.h"
 
 //LED constants
-#define LEDPIN          11    // Arduino pin tied to LED.
+#define LEDPIN          11    // Arduino pin tied to theLED.
 #define LEDPIN2         12    // Arduino pin tied to the second LED.
+#define LEDPIN3         13    // Arduino pin tied to the third LED.
+#define LEDPIN4         14    // Arduino pin tied to the fourth LED.
 #define FLICKERDURATION 5000  //How many Milliseconds the flicker effect should play for
 #define FLICKERINTERVAL 50    //How many Milliseconds each flicker Interval should take
 
@@ -27,6 +29,9 @@ int randomValue = 0;
 //Gyro setup
 MPU6050 accelgyro;
 int16_t ax, ay, az;
+
+const int LEDPINS[] = {LEDPIN, LEDPIN2, LEDPIN3, LEDPIN4};
+const int NUM_LEDS = sizeof(LEDPINS) / sizeof(LEDPINS[0]);
 
 void setup()
 {
@@ -68,32 +73,64 @@ void loop() {
 }
 
 void flicker(){
-  //Flicker for the time specified in flickerduration
   unsigned long startTime = millis();
+
   while (millis() - startTime < FLICKERDURATION) {
 
-    randomValue = random(2);  // Generate a random number (0 or 1)
-
-    if (randomValue == 0) {
-      digitalWrite(LEDPIN, LOW);
-    } else {
-      digitalWrite(LEDPIN, HIGH);
+    for (int i = 0; i < NUM_LEDS; i++) {
+      digitalWrite(LEDPINS[i], random(2));
     }
-
-    randomValue = random(2);  // Generate a random number (0 or 1)
-    if (randomValue == 0) {
-      digitalWrite(LEDPIN2, LOW);
-    } else {
-      digitalWrite(LEDPIN2, HIGH);
-    }
-
-    //TODO: Maybe for-loop this
    
     delay(50);
   }
 }
 
 void turnLeds(int state){
+  for (int i = 0; i < NUM_LEDS; i++) {
+      digitalWrite(LEDPINS[i], state);
+    }
+}
+
+void turnLedsold(int state){
   digitalWrite(LEDPIN,state); //turn on the led
   digitalWrite(LEDPIN2,state); //turn on the led
+  digitalWrite(LEDPIN3,state); //turn on the led
+  digitalWrite(LEDPIN4,state); //turn on the led
+}
+
+void flickerold(){
+  //Flicker for the time specified in flickerduration
+  unsigned long startTime = millis();
+  while (millis() - startTime < FLICKERDURATION) {
+
+    randomValue = random(2);  // Generate a random number (0 or 1)
+    if (randomValue == 0) {   // Turn the LED on or off based on the random number
+      digitalWrite(LEDPIN, LOW);
+    } else {
+      digitalWrite(LEDPIN, HIGH);
+    }
+
+    randomValue = random(2);  // Generate a random number (0 or 1)
+    if (randomValue == 0) {   // Turn the LED on or off based on the random number
+      digitalWrite(LEDPIN2, LOW);
+    } else {
+      digitalWrite(LEDPIN2, HIGH);
+    }
+
+    randomValue = random(2);  // Generate a random number (0 or 1)
+    if (randomValue == 0) {   // Turn the LED on or off based on the random number
+      digitalWrite(LEDPIN3, LOW);
+    } else {
+      digitalWrite(LEDPIN3, HIGH);
+    }
+
+    randomValue = random(2);  // Generate a random number (0 or 1)
+    if (randomValue == 0) {   // Turn the LED on or off based on the random number
+      digitalWrite(LEDPIN4, LOW);
+    } else {
+      digitalWrite(LEDPIN4, HIGH);
+    }
+   
+    delay(50);
+  }
 }
