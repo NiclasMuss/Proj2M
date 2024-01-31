@@ -1,45 +1,51 @@
+/*
+  Proj2-M WS 2023/24
+  Knock-Textiles Software
+  Author: Niclas Muss
+*/
+
 // include the library code
 #include "Arduino.h"
 #include "SoftwareSerial.h"
 #include "DFRobotDFPlayerMini.h"
 
-#define KNOCKPIN  8    // Arduino pin tied to the Knock-Sensor
-#define MP3LENGTH 10000 // Length of the Mp3 file in Milliseconds
+#define KNOCKPIN  8 // the number of the first knock sensor pin
+#define KNOCKPIN2  7 // the number of the second knock sensor pin
 
-int shock = 0; //initialize the variable shock as 0 TODO: could use for error handling
-
+//Mp3-Player Objects
 SoftwareSerial mySoftwareSerial(10, 11); // RX, TX
 DFRobotDFPlayerMini myDFPlayer;
 
-void setup() {
-  
-  pinMode(KNOCKPIN,INPUT); //initialize Knock-Sensor as an input
-  mySoftwareSerial.begin(9600);
-  Serial.begin(57600);
+// variable for reading the knock sensor status (HIGH = no knock detected)
+int knockState = HIGH;
+int knockState2 = HIGH;
 
-  Serial.println();
-  Serial.println(F("DFRobot DFPlayer Mini Demo"));
-  Serial.println(F("Initializing DFPlayer ... (May take 3~5 seconds)"));
-  
-  if (!myDFPlayer.begin(mySoftwareSerial)) {  //Use softwareSerial to communicate with mp3.
-    Serial.println(F("Unable to begin:"));
-    Serial.println(F("1.Please recheck the connection!"));
-    Serial.println(F("2.Please insert the SD card!"));
-    while(true);
-  }
-  Serial.println(F("DFPlayer Mini online."));
-  myDFPlayer.volume(2);  //Set volume value. From 0 to 30
+void setup() 
+{
+  // initialize the knock sensor pins as input: 
+  pinMode(KNOCKPIN, INPUT);
+  pinMode(KNOCKPIN2, INPUT);
+  //inititalize the Mp3-Player
+  mySoftwareSerial.begin(9600);
+  myDFPlayer.begin(mySoftwareSerial);
+  myDFPlayer.volume(30);  //Set volume value. From 0 to 30
 }
 
-void loop() {
-
-  shock = digitalRead(KNOCKPIN); //read the value from Knock-Sensor
-  //TODO: multiple Sensors
-  Serial.println(shock);
-
-  if(shock == LOW)  //with vibration signal
+void loop()
+{
+  knockState = digitalRead(KNOCKPIN); // read the state of the knock sensor value:
+  if (knockState == LOW)
   {
     myDFPlayer.play(1);  //Play the first mp3
-    delay(MP3LENGTH);
+    delay(2000);
+  }
+
+  knockState2 = digitalRead(KNOCKPIN2); // read the state of the knock sensor value:
+  if (knockState2 == LOW)
+  {
+    myDFPlayer.play(2);  //Play the second mp3
+    delay(2000);
   }
 }
+
+
