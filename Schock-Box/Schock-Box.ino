@@ -10,9 +10,9 @@
 
 //LED constants
 #define LEDPIN          11    // Arduino pin tied to theLED.
-#define LEDPIN2         12    // Arduino pin tied to the second LED.
-#define LEDPIN3         13    // Arduino pin tied to the third LED.
-#define LEDPIN4         14    // Arduino pin tied to the fourth LED.
+#define LEDPIN2         9    // Arduino pin tied to the second LED.
+#define LEDPIN3         8    // Arduino pin tied to the third LED.
+#define LEDPIN4         10    // Arduino pin tied to the fourth LED.
 #define FLICKERDURATION 5000  //How many Milliseconds the flicker effect should play for
 #define FLICKERINTERVAL 50    //How many Milliseconds each flicker Interval should take
 
@@ -20,7 +20,7 @@
 #define TRIGGER_PIN     2     // Arduino pin tied to trigger pin on the ultrasonic sensor.
 #define ECHO_PIN        3     // Arduino pin tied to echo pin on the ultrasonic sensor.
 #define MAX_DISTANCE    400   // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
-#define DETECTION_DISTANCE 10 //Distance that counts as detection
+#define DETECTION_DISTANCE 20 //Distance that counts as detection
 
 NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
 int dist = 0;
@@ -29,6 +29,7 @@ int randomValue = 0;
 //Gyro setup
 MPU6050 accelgyro;
 int16_t ax, ay, az;
+int16_t gx, gy, gz;
 
 const int LEDPINS[] = {LEDPIN, LEDPIN2, LEDPIN3, LEDPIN4};
 const int NUM_LEDS = sizeof(LEDPINS) / sizeof(LEDPINS[0]);
@@ -53,16 +54,18 @@ void loop() {
   //TODO: Maybe move this part
 
   //If the Box is lifted start flickering
-  accelgyro.getAcceleration(&ax, &ay, &az); //get Accelearation value
-  Serial.println(az);
-  if(az>23000)  //when lifted
+  accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+  Serial.print("X = "); Serial.print(gx);
+  Serial.print(" | Y = "); Serial.print(gy);
+  Serial.print(" | Z = ");  Serial.println(gz); 
+  if(gz>400 || gz<-200)  //when lifted
   {
     flicker();
   }
   
   else  //when stationary
   {
-    if (dist < DETECTION_DISTANCE){ //Person is detected (this can be done better)
+    if (dist < DETECTION_DISTANCE && dist != 0){ //Person is detected (this can be done better)
       turnLeds(HIGH);
     }
     else {
