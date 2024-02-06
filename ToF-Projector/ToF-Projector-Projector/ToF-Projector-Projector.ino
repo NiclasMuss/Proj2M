@@ -37,6 +37,7 @@ bool change = false;
 void setup() {
   mySoftwareSerial.begin(9600);
   myDFPlayer.begin(mySoftwareSerial);
+  myDFPlayer.enableLoopAll(); //loop all mp3 files.
   myDFPlayer.volume(volume);  //Set volume value. From 0 to 30
   myDFPlayer.play(1);  //Play the first mp3
 
