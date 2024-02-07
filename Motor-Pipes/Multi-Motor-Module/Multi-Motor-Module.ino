@@ -9,7 +9,7 @@
 //Motor variables
 CheapStepper stepper1 (2, 3, 4, 5);
 CheapStepper stepper2 (9, 10, 11, 12);
-//CheapStepper stepper3 (15, 16, 17, 18);
+CheapStepper stepper3 (15, 16, 17, 18);
 
 boolean moveClockwise = true;
 int rotation = 0; //on full rotation is 4096 Steps
@@ -30,21 +30,22 @@ void loop() {
 
   if(input == HIGH){
     //rotate the motor by one step
-    //rotateMotor();
-    stepper1.step(moveClockwise);
-    stepper2.step(moveClockwise);
+    rotateMotor();
+    //stepper1.step(moveClockwise);
+    //stepper2.step(moveClockwise);
     //stepper3.step(moveClockwise);
   }
   else{
   }
 }
-/*
+
 void rotateMotor(){
-  stepper.step(moveClockwise);
+  stepper1.step(moveClockwise);
+    stepper2.step(moveClockwise);
+    stepper3.step(moveClockwise);
   rotation = rotation + 1;
   if(rotation > 4096){ //only rotate 360 degrees than turn (maybe not neccesary)
     moveClockwise = !moveClockwise;
     rotation = 0;
   }
 }
-*/
