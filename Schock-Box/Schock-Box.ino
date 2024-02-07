@@ -1,3 +1,9 @@
+/*
+  Proj2-M WS 2023/24
+  Gyro-box Software
+  Author: Niclas Muss
+*/
+
 // include the library code
 
 //Ultrasonic library
@@ -40,31 +46,23 @@ void setup()
   pinMode(LEDPIN2,OUTPUT); //initialize ledPin switch as an output
   Serial.begin(115200);
   Wire.begin();
-  accelgyro.initialize(); //TODO: Offset
+  accelgyro.initialize();
 }
 
 void loop() {
 
-  //Print Ping in the Serial Monitor
-  unsigned int uS = sonar.ping(); // Send ping, get ping time in microseconds (uS).
-  dist = uS / US_ROUNDTRIP_CM; //convert to cm
-  Serial.print("Ping: ");
-  Serial.print(dist);
-  Serial.println("cm");
-  //TODO: Maybe move this part
-
   //If the Box is lifted start flickering
   accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-  Serial.print("X = "); Serial.print(gx);
-  Serial.print(" | Y = "); Serial.print(gy);
-  Serial.print(" | Z = ");  Serial.println(gz); 
-  if(gz>400 || gz<-200)  //when lifted
+  //different values based on how the Gyro has been mounted
+  if(gz>400 || gz<-200)  //when lifted (gy restingin vaslue was 200
   {
     flicker();
   }
   
   else  //when stationary
   {
+    unsigned int uS = sonar.ping(); // Send ping, get ping time in microseconds (uS).
+    dist = uS / US_ROUNDTRIP_CM; //convert to cm
     if (dist < DETECTION_DISTANCE && dist != 0){ //Person is detected (this can be done better)
       turnLeds(HIGH);
     }
@@ -92,48 +90,4 @@ void turnLeds(int state){
   for (int i = 0; i < NUM_LEDS; i++) {
       digitalWrite(LEDPINS[i], state);
     }
-}
-
-void turnLedsold(int state){
-  digitalWrite(LEDPIN,state); //turn on the led
-  digitalWrite(LEDPIN2,state); //turn on the led
-  digitalWrite(LEDPIN3,state); //turn on the led
-  digitalWrite(LEDPIN4,state); //turn on the led
-}
-
-void flickerold(){
-  //Flicker for the time specified in flickerduration
-  unsigned long startTime = millis();
-  while (millis() - startTime < FLICKERDURATION) {
-
-    randomValue = random(2);  // Generate a random number (0 or 1)
-    if (randomValue == 0) {   // Turn the LED on or off based on the random number
-      digitalWrite(LEDPIN, LOW);
-    } else {
-      digitalWrite(LEDPIN, HIGH);
-    }
-
-    randomValue = random(2);  // Generate a random number (0 or 1)
-    if (randomValue == 0) {   // Turn the LED on or off based on the random number
-      digitalWrite(LEDPIN2, LOW);
-    } else {
-      digitalWrite(LEDPIN2, HIGH);
-    }
-
-    randomValue = random(2);  // Generate a random number (0 or 1)
-    if (randomValue == 0) {   // Turn the LED on or off based on the random number
-      digitalWrite(LEDPIN3, LOW);
-    } else {
-      digitalWrite(LEDPIN3, HIGH);
-    }
-
-    randomValue = random(2);  // Generate a random number (0 or 1)
-    if (randomValue == 0) {   // Turn the LED on or off based on the random number
-      digitalWrite(LEDPIN4, LOW);
-    } else {
-      digitalWrite(LEDPIN4, HIGH);
-    }
-   
-    delay(50);
-  }
 }
